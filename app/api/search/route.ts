@@ -15,9 +15,6 @@ export async function GET(request: Request) {
   }
 
   try {
-    // Replace with your own instance if necessary
-    const searxInstance = "https://searx.be";
-
     const response = await axios.get(`http://localhost:8080/search?q=${query}&format=json&pageno=${page}`, {
       params: {
         q: query,
