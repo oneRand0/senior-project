@@ -4,6 +4,7 @@ import { useSearchParams, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import axios from "axios"
 import Link from "@/node_modules/next/link"
+import { useLocalStorage } from "@/hooks/useLocalStorage"
 
 type SearchResult = {
   title: string
@@ -13,6 +14,8 @@ type SearchResult = {
 }
 
 export default function SearchResults() {
+  const [safeSearch, setSafeSearch] = useLocalStorage("safe_search", false)
+  const [blockedDomains, setBlockedDomains] = useLocalStorage("blocked_domains", [])
   const searchParams = useSearchParams()
   const query = searchParams.get("q")
   const page = parseInt(searchParams.get("pageno") || "1")
@@ -27,22 +30,27 @@ export default function SearchResults() {
     if (searchQuery.trim()) {
       console.log(searchQuery)
 
-      router.push(`/search?q=${searchQuery}&pageno=1`)
+      router.push(`/search?q=${searchQuery}&safesearch=${safeSearch}&pageno=1`)
     }
   }
   const handlePageChange = (newPage: number) => {
     console.log(newPage)
-    router.push(`/search?q=${query}&pageno=${newPage}`)
+    router.push(`/search?q=${query}&safesearch=${safeSearch}&pageno=${newPage}`)
   }
 
   useEffect(() => {
     if (query) {
       axios
-        .get(`/api/search?q=${query}&pageno=${page}`)
+        .get(`/api/search?q=${query}&safesearch=${safeSearch}&pageno=${page}`)
         .then((res) => {
           console.log(res.data)
 
-          setResults(res.data.results)
+          const filteredLinks = res.data.results.filter((item) => {
+            return !blockedDomains.some((domain) => item.parsed_url[1].includes(domain))
+          })
+          console.log(filteredLinks)
+
+          setResults(filteredLinks)
           setInfoBox(res.data.infoboxes[0])
           setLoading(false)
         })
@@ -54,8 +62,8 @@ export default function SearchResults() {
   }, [query, page])
 
   return (
-    <div className="min-h-screen bg-[#1E1E1E] text-white p-8">
-      <form onSubmit={handleSearch} className="flex items-center  mb-8">
+    <div className="min-h-screen bg-[#1E1E1E] text-white ">
+      <form onSubmit={handleSearch} className="flex items-center sticky top-0 bg-[#1E1E1E] w-full z-10 shadow-lg p-8 mb-4">
         <Link href="/">
           <h1 className="text-xl font-semibold text-white mr-4">Proxy Search</h1>
         </Link>
@@ -72,13 +80,14 @@ export default function SearchResults() {
           </button>
         </div>
       </form>
-
-      <h1 className="text-4xl mb-8">Search Results for: {query}</h1>
-
+      <h1 className="text-4xl pl-8 mb-8">Search Results for: {query}</h1>
+      <Link href={`/images?q=${query}/images`}>
+        <h1 className="text-xl pl-8 mb-8">Search for images</h1>
+      </Link>
       {loading ? (
         <p>Loading...</p>
       ) : (
-        <div className="flex gap-8">
+        <div className="flex pl-8 gap-8">
           <div className="w-2/3">
             {results.map((result, index) => (
               <div key={index} className="bg-[#171717] border-2 border-white p-4 rounded-lg mb-4 shadow-lg">
@@ -112,7 +121,6 @@ export default function SearchResults() {
           ) : null}
         </div>
       )}
-
       <div className="mt-8 flex bottom-0 justify-center gap-4">
         <button className="px-4 py-2 bg-gray-700 text-white rounded-full" disabled={page === 1} onClick={() => handlePageChange(page - 1)}>
           Previous
