@@ -28,8 +28,6 @@ export default function SearchResults() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
-      console.log(searchQuery)
-
       router.push(`/search?q=${searchQuery}&safesearch=${safeSearch}&pageno=1`)
     }
   }
@@ -43,19 +41,15 @@ export default function SearchResults() {
       axios
         .get(`/api/search?q=${query}&safesearch=${safeSearch}&pageno=${page}`)
         .then((res) => {
-          console.log(res.data.results)
-
           const filteredLinks = res.data.results.filter((item) => {
             return !blockedDomains.some((domain) => item.parsed_url[1].includes(domain))
           })
-          console.log(filteredLinks)
 
           setResults(filteredLinks)
           setInfoBox(res.data.infoboxes[0])
           setLoading(false)
         })
         .catch((err) => {
-          console.error(err)
           setLoading(false)
         })
     }

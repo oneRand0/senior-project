@@ -7,16 +7,12 @@ export async function GET(request: Request) {
   const page = searchParams.get("pageno") || "1"; 
   const safety = searchParams.get("safesearch") || "2"; 
 
-
-  console.log(page);
-  
-
   if (!query) {
     return NextResponse.json({ error: "Missing query" }, { status: 400 });
   }
 
   try {
-    const response = await axios.get(`http://localhost:8080/search?q=${query}&format=json&safesearch=${safety}&pageno=${page}`, {
+    const response = await axios.get(`http://localhost:8080/search?q=${query}&format=json&safesearch=${safety?1:0}&pageno=${page}`, {
       params: {
         q: query,
         format: "json",

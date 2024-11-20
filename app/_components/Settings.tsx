@@ -16,7 +16,6 @@ function Settings({ setSettingsModal }: any) {
 
     if (!temp.includes(inputValue)) {
       temp.push(inputValue)
-      console.log(temp)
       setBlockedDomains(temp)
       setInputValue("")
     }

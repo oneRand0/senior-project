@@ -19,8 +19,6 @@ function ImageResults() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
-      console.log(searchQuery)
-
       router.push(`/images?q=${searchQuery}`)
     }
   }
@@ -30,12 +28,9 @@ function ImageResults() {
       axios
         .get(`/api/images?q=${query}&safesearch=${safeSearch}`)
         .then((res) => {
-          console.log(res.data)
-
           const filteredLinks = res.data.results.filter((item) => {
             return !blockedDomains.some((domain) => item.parsed_url[1].includes(domain))
           })
-          console.log(filteredLinks)
           setResults(filteredLinks)
         })
         .catch((err) => {
