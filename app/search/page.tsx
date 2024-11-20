@@ -43,7 +43,7 @@ export default function SearchResults() {
       axios
         .get(`/api/search?q=${query}&safesearch=${safeSearch}&pageno=${page}`)
         .then((res) => {
-          console.log(res.data)
+          console.log(res.data.results)
 
           const filteredLinks = res.data.results.filter((item) => {
             return !blockedDomains.some((domain) => item.parsed_url[1].includes(domain))

@@ -61,7 +61,6 @@ function Settings({ setSettingsModal }: any) {
         <div className="flex flex-col gap-4">
           <h1>Blocked Domains</h1>
           <div className="flex flex-row gap-4">
-            {/* test input */}
             <input
               id="safeInput"
               type="text"
@@ -71,7 +70,6 @@ function Settings({ setSettingsModal }: any) {
               placeholder="Add a blocked domain EX. google.com"
               aria-describedby="input-error"
             />
-            {/* add button */}
             <button onClick={() => addDomain()} className="bg-[#1B1B1B] hover:bg-white hover:text-black self-end font-semibold px-1 py-2 rounded-md w-10  ring-1 ring-white transition">
               +
             </button>
